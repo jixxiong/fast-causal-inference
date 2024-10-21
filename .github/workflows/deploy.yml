@@ -27,7 +27,7 @@ jobs:
       - name: Install the dependencies
         run: |
             python -m pip install -r requirements.txt
-      - shell: bash
+      - name: replace secrets
         run: |
           sed -i "s|\(starrocks_launch_host:\s*\).*|\1${{ secrets.starrocks_host }}|g" ./conf/package_conf.yaml
           sed -i "s|\(starrocks_port:\s*\).*|\1${{ secrets.starrocks_port }}|g" ./conf/package_conf.yaml
@@ -38,15 +38,14 @@ jobs:
           mkdir -p ./docs/ipynbs/ipynbs_config/
           cp ./conf/package_conf.yaml ./docs/ipynbs/ipynbs_config/conf.yaml
       - name: Build the JupyterLite site
-        shell: bash -l {0}
         run: |
-          jupyter lite build --contents docs/ipynbs --output-dir ipynb
-          mkdir -p ./ipynb/docs/
-          cp -r ./docs/* ./ipynb/docs/
+          jupyter lite build --contents docs/ipynbs --output-dir dist
+          mkdir -p ./dist/docs/
+          cp -r ./docs/* ./dist/docs/
       - name: Upload JupyterLite site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./ipynb
+          path: ./dist
 
 
   deploy:
